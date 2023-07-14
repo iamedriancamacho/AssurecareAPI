@@ -10,41 +10,46 @@ namespace AssurecareAPI.Controllers
     [ApiController]
     public class OpenAIController : ControllerBase
     {
-        //private readonly string API_KEY = "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";
-        //private readonly string API_KEY2 = "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";
-        private readonly string API_KEY3 = "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";
         [HttpGet]
-        public async Task<ActionResult<OpenAI>> getPrompt(string Query)
+        public async Task<ActionResult<OpenAI>> GetPrompt(string Query)
         {
-            OpenAIAPI openAIAPI = new OpenAIAPI(API_KEY3);
-            string result = " ";
-            CompletionRequest completionRequest = new()
-            {
-                Prompt = Query,
-                Model = OpenAI_API.Models.Model.DavinciText,
-                MaxTokens = 100
-            };
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .Build();
 
-            var completions = await openAIAPI.Completions.CreateCompletionAsync(completionRequest);
+            string? temp = configuration.GetSection("ApiKeys").GetSection("ApiKey_OpenAI").Value;
 
-            if (completions.Completions.Count==0)//completions.Result.completions
+            if (string.IsNullOrEmpty(temp))
             {
                 return BadRequest();
             }
-            else 
+            else
             {
-                foreach (var completion in completions.Completions)//completions.Result.completions
+                OpenAIAPI openAIAPI = new(apiKeys: temp);
+                CompletionRequest completionRequest = new()
                 {
-                    result += completion.Text;
+                    Prompt = Query,
+                    Model = OpenAI_API.Models.Model.DavinciText,
+                    MaxTokens = 100
+                };
+
+                var completions = await openAIAPI.Completions.CreateCompletionAsync(completionRequest);
+                string? result = null;
+                if (!completions.Completions.Any())//completions.Result.completions
+                {
+                    return BadRequest();
                 }
-                Console.WriteLine(result);
-                return Ok(result);
+                else
+                {
+                    foreach (var completion in completions.Completions)//completions.Result.completions
+                    {
+                        result += completion.Text;
+                    }
+                    Console.WriteLine(result);
+                    return Ok(result);
+                }
             }
         }
-            
-
     }
-
-    }
-    
-
+}

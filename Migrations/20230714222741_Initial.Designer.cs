@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AssurecareAPI.Migrations
 {
     [DbContext(typeof(BrandContext))]
-    [Migration("20230711195242_Initial")]
+    [Migration("20230714222741_Initial")]
     partial class Initial
     {
         /// <inheritdoc />

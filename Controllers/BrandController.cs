@@ -11,14 +11,16 @@ namespace AssurecareAPI.Controllers
     public class BrandController : ControllerBase
     {
         private readonly BrandContext _brandContext;
+
         public BrandController(BrandContext brandContext)
         {
             _brandContext = brandContext;
         }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Brand>>> GetResults()
         {
-           if (_brandContext == null)
+            if (_brandContext == null)
             {
                 return BadRequest(ModelState);
             }
@@ -45,20 +47,21 @@ namespace AssurecareAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Brand>> PostBrand(Brand brand)
         {
-                brand.BrandId = Guid.NewGuid().ToString(); //uniqueIdentifier
-                brand.ActiveFlag= true;
-                _brandContext.Brands.Add(brand);
-                await _brandContext.SaveChangesAsync();
-                return CreatedAtAction(nameof(GetResult), new { Id = brand.BrandId }, brand);
+            brand.BrandId = Guid.NewGuid().ToString(); //uniqueIdentifier
+            brand.ActiveFlag = true;
+            _brandContext.Brands.Add(brand);
+            await _brandContext.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetResult), new { Id = brand.BrandId }, brand);
         }
+
         [HttpPut]
-        public async Task<ActionResult<Brand>> UpdateBrand(String Id, [FromBody] Brand brand) 
+        public async Task<ActionResult<Brand>> UpdateBrand(String Id, [FromBody] Brand brand)
         {
             if (Id != brand.BrandId)
             {
                 return BadRequest(ModelState);
             }
-            else 
+            else
             {
                 _brandContext.Entry(brand).State = EntityState.Modified;
 
@@ -68,7 +71,7 @@ namespace AssurecareAPI.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!isDataExist(Id))
+                    if (!IsDataExist(Id))
                     {
                         return NotFound();
                     }
@@ -79,11 +82,10 @@ namespace AssurecareAPI.Controllers
                 }
                 return Ok(brand);
             }
-        
         }
 
         [HttpDelete]
-        public async Task<ActionResult<Brand>> DeleteBrand(string Id) 
+        public async Task<ActionResult<Brand>> DeleteBrand(string Id)
         {
             if (_brandContext.Brands == null)
             {
@@ -104,11 +106,11 @@ namespace AssurecareAPI.Controllers
                 }
             }
         }
+
         //checks wether the data exists in the table or not.
-        private bool isDataExist(String Id)
+        private bool IsDataExist(String Id)
         {
-            return (_brandContext.Brands?.Any( x=> x.BrandId == Id)).GetValueOrDefault();
+            return (_brandContext.Brands?.Any(x => x.BrandId == Id)).GetValueOrDefault();
         }
-        
     }
 }
